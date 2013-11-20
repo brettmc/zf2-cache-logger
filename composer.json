@@ -1,5 +1,5 @@
 {
-	"name" : "deakin/zend_cache_plugin_eventlogger",
+	"name" : "deakin/cache-eventlogger",
 	"type" : "library",
 	"authors" : [{
 			"name" : "Brett McBride",
