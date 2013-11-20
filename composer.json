@@ -1,5 +1,5 @@
 {
-	"name" : "deakin/zf2-cache-logger",
+	"name" : "Deakin/zf2-cache-logger",
 	"type" : "library",
 	"authors" : [{
 			"name" : "Brett McBride",
