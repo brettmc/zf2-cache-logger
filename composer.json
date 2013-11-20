@@ -1,5 +1,5 @@
 {
-	"name" : "deakin/cache-eventlogger",
+	"name" : "deakin/zf2-cache-eventlogger",
 	"type" : "library",
 	"authors" : [{
 			"name" : "Brett McBride",
