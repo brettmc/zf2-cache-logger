@@ -9,8 +9,7 @@ use Zend\Cache\Storage\PostEvent;
 use ArrayObject;
 use Zend\Cache\Storage\Adapter\AdapterOptions;
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-//use Monolog\Handler\NullHandler;
+use Monolog\Handler\NullHandler;
 
 class EventLoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,12 +25,15 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$adapterOptions->setNameSpace('DeakinTestNamespace');
 		$adapterOptions->setTtl(10);
 		$this->_adapter->setOptions($adapterOptions);
-		//$this->_pluginOptions = new EventLoggerOptions();
+		
 		$this->_plugin = new EventLogger();
 		//$this->_plugin->setOptions($this->_pluginOptions);
 		$this->_logger = new Logger('test-cache-events');
-		$this->_logger->pushHandler(new StreamHandler( 'php://stdout', Logger::INFO));
+		//$this->_logger->pushHandler(new StreamHandler( 'php://stdout', Logger::INFO));
+		$this->_logger->pushHandler(new NullHandler());
 		//$this->_logger->pushHandler(new StreamHandler('/tmp/cache.log', Logger::INFO));
+		//$this->_pluginOptions = new EventLoggerOptions(array('logger' => $this->_logger));
+		//$this->_plugin->setOptions($this->_pluginOptions);
 	}
 	
 	public function testAddPlugin()
@@ -87,6 +89,24 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	
 		// no events should be attached
 		$this->assertEquals(0, count($this->_adapter->getEventManager()->getEvents()));
+	}
+	
+	/**
+	 * Tests that when the plugin is attached to an adapter, an event is successfully logged to the logger.
+	 */
+	public function testSomethingIsLoggedWhenPluginAttachedToAdapter()
+	{
+		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
+		$mock->expects($this->once())
+			->method('info')
+			->with($this->stringContains('read miss'));
+		
+		$pluginOptions = new EventLoggerOptions(array('logger' => $mock));
+		$plugin = new EventLogger();
+		$plugin->setOptions($pluginOptions);
+		$this->_adapter->addPlugin($plugin);
+		
+		$this->_adapter->getItem('a_key');
 	}
 	
 	/**
