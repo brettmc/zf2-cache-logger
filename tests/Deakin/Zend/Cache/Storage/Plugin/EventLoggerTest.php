@@ -27,13 +27,8 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$this->_adapter->setOptions($adapterOptions);
 		
 		$this->_plugin = new EventLogger();
-		//$this->_plugin->setOptions($this->_pluginOptions);
 		$this->_logger = new Logger('test-cache-events');
-		//$this->_logger->pushHandler(new StreamHandler( 'php://stdout', Logger::INFO));
 		$this->_logger->pushHandler(new NullHandler());
-		//$this->_logger->pushHandler(new StreamHandler('/tmp/cache.log', Logger::INFO));
-		//$this->_pluginOptions = new EventLoggerOptions(array('logger' => $this->_logger));
-		//$this->_plugin->setOptions($this->_pluginOptions);
 	}
 	
 	public function testAddPlugin()
