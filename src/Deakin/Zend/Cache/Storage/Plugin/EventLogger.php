@@ -20,11 +20,6 @@ class EventLogger extends AbstractPlugin
 	protected $capabilities = array();
 	
 	/**
-	 * @var Psr\Log\LoggerInterface;
-	 */
-	protected $logger;
-	
-	/**
 	* {@inheritDoc}
 	*/
     public function attach(EventManagerInterface $events, $priority = 1)
