@@ -56,7 +56,7 @@ class EventLogger extends AbstractPlugin
 	public function onReadItemPost(PostEvent $event)
 	{
 		$storage = $event->getStorage();
-		$success = $event->getResult() === true;
+		$success = $event->getParam('success') === true;
 		$this->getOptions()->getLogger()->info(
 			sprintf('read %s', ($success === true) ? 'hit' : 'miss'),
 			array(
@@ -64,7 +64,7 @@ class EventLogger extends AbstractPlugin
 				'namespace' => $storage->getOptions()->getNamespace(),
 				'operation' => 'read',
 				'key' => $event->getParam('key'),
-				'success' => $event->getResult())
+				'success' => $event->getParam('success'))
 		);
 	}
 	
@@ -80,6 +80,7 @@ class EventLogger extends AbstractPlugin
 			$this->getOptions()->getLogger()->info(
 				sprintf('read %s', ($success === true) ? 'hit' : 'miss'),
 				array(
+					'event' => $event->getName(),
 					'class' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
 					'operation' => 'read',
@@ -96,6 +97,7 @@ class EventLogger extends AbstractPlugin
 		$this->getOptions()->getLogger()->info(
 			sprintf('write %s', ($success === true) ? 'success' : 'fail'),
 			array(
+				'event' => $event->getName(),
 				'class' => get_class($storage),
 				'namespace' => $storage->getOptions()->getNamespace(),
 				'ttl' => $storage->getOptions()->getTtl(),
@@ -115,6 +117,7 @@ class EventLogger extends AbstractPlugin
 			$this->getOptions()->getLogger()->info(
 				sprintf('write %s', ($success === true) ? 'success' : 'fail'),
 				array(
+					'event' => $event->getName(),
 					'class' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
 					'ttl' => $storage->getOptions()->getTtl(),
@@ -132,6 +135,7 @@ class EventLogger extends AbstractPlugin
 		$this->getOptions()->getLogger()->info(
 			sprintf('remove %s', ($success === true) ? 'success' : 'fail'),
 			array(
+				'event' => $event->getName(),
 				'class' => get_class($storage),
 				'namespace' => $storage->getOptions()->getNamespace(),
 				'operation' => 'remove',
@@ -150,6 +154,7 @@ class EventLogger extends AbstractPlugin
 			$this->getOptions()->getLogger()->info(
 				sprintf('remove %s', ($success === true) ? 'success' : 'fail'),
 				array(
+					'event' => $event->getName(),
 					'class' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
 					'operation' => 'remove',

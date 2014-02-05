@@ -107,7 +107,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @dataProvider getItemPostProvider
 	 */
-	public function testGetItemPost($key, $result, $expectedLogContent)
+	public function testGetItemPost($key, $result, $success, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
 		/*$mock->expects($this->exactly($expectedFailCount + $expectedSuccessCount))
@@ -130,7 +130,8 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		//$this->_adapter->addPlugin($plugin);
 		
 		$event = new PostEvent('getItem.post', $this->_adapter, new ArrayObject(array(
-			'key' => $key
+			'key' => $key,
+			'success' => $success
 		)), $result);
 		$plugin->onReadItemPost($event);
 		$this->assertSame($result, $event->getResult());
@@ -140,10 +141,10 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	{
 		return array(
 			array(
-				'key1', true, array('hit')
+				'key1', 'value1', true, array('hit')
 			),
 			array(
-				'non_existent_key', false, array('miss')
+				'non_existent_key', null, false, array('miss')
 			)
 		);
 	}
