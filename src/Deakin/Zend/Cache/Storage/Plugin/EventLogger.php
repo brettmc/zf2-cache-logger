@@ -60,11 +60,13 @@ class EventLogger extends AbstractPlugin
 		$this->getOptions()->getLogger()->info(
 			sprintf('read %s', ($success === true) ? 'hit' : 'miss'),
 			array(
-				'class' => get_class($storage),
-				'namespace' => $storage->getOptions()->getNamespace(),
 				'operation' => 'read',
+				'success' => $event->getParam('success'),
 				'key' => $event->getParam('key'),
-				'success' => $event->getParam('success'))
+				'event' => $event->getName(),
+				'adapter' => get_class($storage),
+				'namespace' => $storage->getOptions()->getNamespace(),
+			)
 		);
 	}
 	
@@ -80,12 +82,13 @@ class EventLogger extends AbstractPlugin
 			$this->getOptions()->getLogger()->info(
 				sprintf('read %s', ($success === true) ? 'hit' : 'miss'),
 				array(
-					'event' => $event->getName(),
-					'class' => get_class($storage),
-					'namespace' => $storage->getOptions()->getNamespace(),
 					'operation' => 'read',
 					'key' => $key,
-					'success' => $success)
+					'success' => $success,
+					'event' => $event->getName(),
+					'adapter' => get_class($storage),
+					'namespace' => $storage->getOptions()->getNamespace(),
+				)
 			);
 		}
 	}
@@ -97,13 +100,14 @@ class EventLogger extends AbstractPlugin
 		$this->getOptions()->getLogger()->info(
 			sprintf('write %s', ($success === true) ? 'success' : 'fail'),
 			array(
+				'operation' => 'read',
+				'key' => $event->getParam('key'),
+				'success' => $success,
 				'event' => $event->getName(),
 				'class' => get_class($storage),
 				'namespace' => $storage->getOptions()->getNamespace(),
 				'ttl' => $storage->getOptions()->getTtl(),
-				'operation' => 'read',
-				'key' => $event->getParam('key'),
-				'success' => $success)
+			)
 		);
 	}
 	
@@ -117,13 +121,14 @@ class EventLogger extends AbstractPlugin
 			$this->getOptions()->getLogger()->info(
 				sprintf('write %s', ($success === true) ? 'success' : 'fail'),
 				array(
+					'operation' => 'write',
+					'key' => $key,
+					'success' => $success,
 					'event' => $event->getName(),
 					'class' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
 					'ttl' => $storage->getOptions()->getTtl(),
-					'operation' => 'write',
-					'key' => $key,
-					'success' => $success)
+				)
 			);
 		}
 	}
@@ -135,12 +140,13 @@ class EventLogger extends AbstractPlugin
 		$this->getOptions()->getLogger()->info(
 			sprintf('remove %s', ($success === true) ? 'success' : 'fail'),
 			array(
+				'operation' => 'remove',
+				'key' => $event->getParam('key'),
+				'success' => $success,
 				'event' => $event->getName(),
 				'class' => get_class($storage),
 				'namespace' => $storage->getOptions()->getNamespace(),
-				'operation' => 'remove',
-				'key' => $event->getParam('key'),
-				'success' => $success)
+			)
 		);
 	}
 	
@@ -154,12 +160,13 @@ class EventLogger extends AbstractPlugin
 			$this->getOptions()->getLogger()->info(
 				sprintf('remove %s', ($success === true) ? 'success' : 'fail'),
 				array(
+					'operation' => 'remove',
+					'key' => $key,
+					'success' => $success,
 					'event' => $event->getName(),
 					'class' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
-					'operation' => 'remove',
-					'key' => $key,
-					'success' => $success)
+				)
 			);
 		}
 	}
