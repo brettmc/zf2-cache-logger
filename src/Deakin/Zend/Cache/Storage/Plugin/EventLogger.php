@@ -104,7 +104,7 @@ class EventLogger extends AbstractPlugin
 				'key' => $event->getParam('key'),
 				'success' => $success,
 				'event' => $event->getName(),
-				'class' => get_class($storage),
+				'adapter' => get_class($storage),
 				'namespace' => $storage->getOptions()->getNamespace(),
 				'ttl' => $storage->getOptions()->getTtl(),
 			)
@@ -125,7 +125,7 @@ class EventLogger extends AbstractPlugin
 					'key' => $key,
 					'success' => $success,
 					'event' => $event->getName(),
-					'class' => get_class($storage),
+					'adapter' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
 					'ttl' => $storage->getOptions()->getTtl(),
 				)
@@ -144,7 +144,7 @@ class EventLogger extends AbstractPlugin
 				'key' => $event->getParam('key'),
 				'success' => $success,
 				'event' => $event->getName(),
-				'class' => get_class($storage),
+				'adapter' => get_class($storage),
 				'namespace' => $storage->getOptions()->getNamespace(),
 			)
 		);
@@ -164,7 +164,7 @@ class EventLogger extends AbstractPlugin
 					'key' => $key,
 					'success' => $success,
 					'event' => $event->getName(),
-					'class' => get_class($storage),
+					'adapter' => get_class($storage),
 					'namespace' => $storage->getOptions()->getNamespace(),
 				)
 			);
