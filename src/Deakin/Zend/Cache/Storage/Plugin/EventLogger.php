@@ -100,7 +100,7 @@ class EventLogger extends AbstractPlugin
 		$this->getOptions()->getLogger()->info(
 			sprintf('write %s', ($success === true) ? 'success' : 'fail'),
 			array(
-				'operation' => 'read',
+				'operation' => 'write',
 				'key' => $event->getParam('key'),
 				'success' => $success,
 				'event' => $event->getName(),
