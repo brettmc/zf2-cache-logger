@@ -35,22 +35,22 @@ class EventLogger extends AbstractPlugin
 
         // write
         $this->listeners[] = $events->attach('setItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('setItems.post', array($this, 'onWriteItemPost'), $postPriority);
+        $this->listeners[] = $events->attach('setItems.post', array($this, 'onWriteItemsPost'), $postPriority);
 
         $this->listeners[] = $events->attach('addItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('addItems.post', array($this, 'onWriteItemPost'), $postPriority);
+        $this->listeners[] = $events->attach('addItems.post', array($this, 'onWriteItemsPost'), $postPriority);
         
         $this->listeners[] = $events->attach('touchItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('touchItems.post', array($this, 'onWriteItemPost'), $postPriority);
+        $this->listeners[] = $events->attach('touchItems.post', array($this, 'onWriteItemsPost'), $postPriority);
 
         $this->listeners[] = $events->attach('replaceItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('replaceItems.post', array($this, 'onWriteItemPost'), $postPriority);
+        $this->listeners[] = $events->attach('replaceItems.post', array($this, 'onWriteItemsPost'), $postPriority);
 
         $this->listeners[] = $events->attach('checkAndSetItem.post', array($this, 'onWriteItemPost'), $postPriority);
         
         // remove
         $this->listeners[] = $events->attach('removeItem.post', array($this, 'onRemoveItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('removeItems.post', array($this, 'onRemoveItemPost'), $postPriority);
+        $this->listeners[] = $events->attach('removeItems.post', array($this, 'onRemoveItemsPost'), $postPriority);
     }
 
 	public function onReadItemPost(PostEvent $event)

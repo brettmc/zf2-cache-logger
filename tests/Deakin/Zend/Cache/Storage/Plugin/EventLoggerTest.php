@@ -41,17 +41,17 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 			'getItems.post' => 'onReadItemsPost',
 	
 			'setItem.post' => 'onWriteItemPost',
-			'setItems.post' => 'onWriteItemPost',
+			'setItems.post' => 'onWriteItemsPost',
 			'addItem.post' => 'onWriteItemPost',
-			'addItems.post' => 'onWriteItemPost',
+			'addItems.post' => 'onWriteItemsPost',
 			'replaceItem.post' => 'onWriteItemPost',
-			'replaceItems.post' => 'onWriteItemPost',
+			'replaceItems.post' => 'onWriteItemsPost',
 			'checkAndSetItem.post' => 'onWriteItemPost',
 			'touchItem.post' => 'onWriteItemPost',
-			'touchItems.post' => 'onWriteItemPost',
+			'touchItems.post' => 'onWriteItemsPost',
 				
 			'removeItem.post' => 'onRemoveItemPost',
-			'removeItems.post' => 'onRemoveItemPost',
+			'removeItems.post' => 'onRemoveItemsPost',
 		);
 		foreach ($expectedListeners as $eventName => $expectedCallbackMethod) {
 			$listeners = $this->_adapter->getEventManager()->getListeners($eventName);
