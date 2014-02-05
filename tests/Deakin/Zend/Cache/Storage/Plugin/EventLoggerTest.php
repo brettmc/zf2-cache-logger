@@ -110,11 +110,6 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	public function testGetItemPost($key, $result, $success, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
-		/*$mock->expects($this->exactly($expectedFailCount + $expectedSuccessCount))
-			->method('info');*/
-			/*->with($this->greaterThan(0),
-                 $this->stringContains('hit'),
-                 $this->anything());*/
 		foreach($expectedLogContent as $at => $msg)
 		{
 			$mock->expects($this->at($at))
@@ -155,8 +150,6 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	public function testGetItemsPost($keys, $resultsFound, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
-		/*$mock->expects($this->exactly($expectedLogCount))
-			->method('info'); //@todo assert on success/fail count?*/
 		foreach($expectedLogContent as $at => $msg)
 		{
 			$mock->expects($this->at($at))
@@ -202,8 +195,6 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	public function testRemoveItemPost($key, $result, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
-		/*$mock->expects($this->exactly($expectedFailCount + $expectedSuccessCount))
-			->method('info');*/
 		foreach($expectedLogContent as $at => $msg)
 		{
 			$mock->expects($this->at($at))
@@ -243,8 +234,6 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	public function testRemoveItemsPost($keys, $keysNotRemoved, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
-		/*$mock->expects($this->exactly($expectedSuccessCount + $expectedFailCount))
-			->method('info'); //@todo assertions based on occurrance of 'success' or 'fail'*/
 		foreach($expectedLogContent as $at => $msg)
 		{
 			$mock->expects($this->at($at))
@@ -288,8 +277,6 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	public function testWriteItemPost($key, $value, $result, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
-		/*$mock->expects($this->exactly($expectedSuccessCount + $expectedFailCount))
-			->method('info');*/
 		foreach($expectedLogContent as $at => $msg)
 		{
 			$mock->expects($this->at($at))
@@ -330,8 +317,6 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	public function testWriteItemsPost($keyValuePairs, $keysNotWritten, $expectedLogContent)
 	{
 		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
-		/*$mock->expects($this->exactly($expectedSuccessCount + $expectedFailCount))
-			->method('info'); //@todo assertions based on occurrance of 'success' or 'fail'*/
 		foreach($expectedLogContent as $at => $msg)
 		{
 			$mock->expects($this->at($at))
