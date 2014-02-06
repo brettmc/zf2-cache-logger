@@ -19,52 +19,79 @@ class EventLogger extends AbstractPlugin
 	 * @var array
 	 */
 	protected $capabilities = array();
+
+	const LISTENERS_ALL = 63; //111111, which can be &'d with the below and will match all values up to 32
+	const LISTENERS_READ = 1;
+	const LISTENERS_WRITE = 2;
+	const LISTENERS_REMOVE = 4;
+	const LISTENERS_EXCEPTION = 8;
+	
+	protected $activeListeners = self::LISTENERS_ALL;
 	
 	/**
 	* {@inheritDoc}
 	*/
     public function attach(EventManagerInterface $events, $priority = 1)
     {
+        $activeListeners = $this->activeListeners;
         // The higher the priority the sooner the plugin will be called on pre events
         // but the later it will be called on post events.
         $prePriority = $priority;
         $postPriority = -$priority;
 
-        // read
-        $this->listeners[] = $events->attach('getItem.post', array($this, 'onReadItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('getItems.post', array($this, 'onReadItemsPost'), $postPriority);
-        $this->listeners[] = $events->attach('getItem.exception', array($this, 'onException'), $postPriority);
-        $this->listeners[] = $events->attach('getItems.exception', array($this, 'onException'), $postPriority);
+        if(($activeListeners & self::LISTENERS_READ) === self::LISTENERS_READ)
+        {
+	        $this->listeners[] = $events->attach('getItem.post', array($this, 'onReadItemPost'), $postPriority);
+	        $this->listeners[] = $events->attach('getItems.post', array($this, 'onReadItemsPost'), $postPriority);
+        }
 
-        // write
-        $this->listeners[] = $events->attach('setItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('setItems.post', array($this, 'onWriteItemsPost'), $postPriority);
-        $this->listeners[] = $events->attach('setItem.exception', array($this, 'onException'), $postPriority);
-        $this->listeners[] = $events->attach('setItems.exception', array($this, 'onException'), $postPriority);
-
-        $this->listeners[] = $events->attach('addItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('addItems.post', array($this, 'onWriteItemsPost'), $postPriority);
-        $this->listeners[] = $events->attach('addItem.exception', array($this, 'onException'), $postPriority);
-        $this->listeners[] = $events->attach('addItems.exception', array($this, 'onException'), $postPriority);
+        if(($activeListeners & self::LISTENERS_WRITE) === self::LISTENERS_WRITE)
+        {
+	        // write
+	        $this->listeners[] = $events->attach('setItem.post', array($this, 'onWriteItemPost'), $postPriority);
+	        $this->listeners[] = $events->attach('setItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+	        	
+	        $this->listeners[] = $events->attach('addItem.post', array($this, 'onWriteItemPost'), $postPriority);
+	        $this->listeners[] = $events->attach('addItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+	        	        
+	        $this->listeners[] = $events->attach('touchItem.post', array($this, 'onWriteItemPost'), $postPriority);
+	        $this->listeners[] = $events->attach('touchItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+	        	
+	        $this->listeners[] = $events->attach('replaceItem.post', array($this, 'onWriteItemPost'), $postPriority);
+	        $this->listeners[] = $events->attach('replaceItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+	        	
+	        $this->listeners[] = $events->attach('checkAndSetItem.post', array($this, 'onWriteItemPost'), $postPriority);
+	                }
         
-        $this->listeners[] = $events->attach('touchItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('touchItems.post', array($this, 'onWriteItemsPost'), $postPriority);
-        $this->listeners[] = $events->attach('touchItem.exception', array($this, 'onException'), $postPriority);
-        $this->listeners[] = $events->attach('touchItems.exception', array($this, 'onException'), $postPriority);
-
-        $this->listeners[] = $events->attach('replaceItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('replaceItems.post', array($this, 'onWriteItemsPost'), $postPriority);
-        $this->listeners[] = $events->attach('replaceItem.exception', array($this, 'onException'), $postPriority);
-        $this->listeners[] = $events->attach('replaceItems.exception', array($this, 'onException'), $postPriority);
-
-        $this->listeners[] = $events->attach('checkAndSetItem.post', array($this, 'onWriteItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('checkAndSetItem.exception', array($this, 'onException'), $postPriority);
+        if(($activeListeners & self::LISTENERS_REMOVE) === self::LISTENERS_REMOVE)
+        {
+	        // remove
+	        $this->listeners[] = $events->attach('removeItem.post', array($this, 'onRemoveItemPost'), $postPriority);
+	        $this->listeners[] = $events->attach('removeItems.post', array($this, 'onRemoveItemsPost'), $postPriority);
+	    }
         
-        // remove
-        $this->listeners[] = $events->attach('removeItem.post', array($this, 'onRemoveItemPost'), $postPriority);
-        $this->listeners[] = $events->attach('removeItems.post', array($this, 'onRemoveItemsPost'), $postPriority);
-        $this->listeners[] = $events->attach('removeItem.exception', array($this, 'onException'), $postPriority);
-        $this->listeners[] = $events->attach('removeItems.exception', array($this, 'onException'), $postPriority);
+        if(($activeListeners & self::LISTENERS_EXCEPTION) === self::LISTENERS_EXCEPTION)
+        {
+        	// exception
+        	$this->listeners[] = $events->attach('getItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('getItems.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('setItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('setItems.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('addItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('addItems.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('touchItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('touchItems.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('replaceItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('replaceItems.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('checkAndSetItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('removeItem.exception', array($this, 'onException'), $postPriority);
+        	$this->listeners[] = $events->attach('removeItems.exception', array($this, 'onException'), $postPriority);
+        }
+    }
+    
+    public function setActiveListeners($listeners)
+    {
+    	$this->activeListeners = $listeners;
     }
 
 	public function onReadItemPost(PostEvent $event)

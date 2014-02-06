@@ -10,13 +10,13 @@ use Zend\Cache\Storage\ExceptionEvent;
 use ArrayObject;
 use Zend\Cache\Storage\Adapter\AdapterOptions;
 use Monolog\Logger;
-use Monolog\Handler\NullHandler;
 
 class EventLoggerTest extends \PHPUnit_Framework_TestCase
 {
 	protected $_adapter;
 	protected $_options;
 	protected $_plugin;
+	protected $_pluginOptions;
 	protected $_logger;
 	
 	public function setUp()
@@ -27,50 +27,21 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$adapterOptions->setTtl(10);
 		$this->_adapter->setOptions($adapterOptions);
 		
+		$this->_pluginOptions = new EventLoggerOptions();
 		$this->_plugin = new EventLogger();
-		/*$this->_logger = new Logger('test-cache-events');
-		$this->_logger->pushHandler(new NullHandler());*/
 	}
 	
-	public function testAddPlugin()
+	/**
+	 * @dataProvider addPluginProvider
+	 * @param int $activeListeners
+	 * @param array $expectedListeners
+	 */
+	public function testAddPlugin($activeListeners, $expectedListeners)
 	{
-		$this->_adapter->addPlugin($this->_plugin, 100);
+		$plugin = new EventLogger();
+		$plugin->setActiveListeners($activeListeners);
+		$this->_adapter->addPlugin($plugin, 100);
 	
-		// check attached callbacks
-		$expectedListeners = array(
-			'getItem.post' => 'onReadItemPost',
-			'getItems.post' => 'onReadItemsPost',
-			'getItem.exception' => 'onException',
-			'getItems.exception' => 'onException',
-	
-			'setItem.post' => 'onWriteItemPost',
-			'setItems.post' => 'onWriteItemsPost',
-			'setItem.exception' => 'onException',
-			'setItems.exception' => 'onException',
-				
-			'addItem.post' => 'onWriteItemPost',
-			'addItems.post' => 'onWriteItemsPost',
-			'addItem.exception' => 'onException',
-			'addItems.exception' => 'onException',
-			
-			'replaceItem.post' => 'onWriteItemPost',
-			'replaceItems.post' => 'onWriteItemsPost',
-			'replaceItem.exception' => 'onException',
-			'replaceItems.exception' => 'onException',
-			
-			'checkAndSetItem.post' => 'onWriteItemPost',
-			'checkAndSetItem.exception' => 'onException',
-			
-			'touchItem.post' => 'onWriteItemPost',
-			'touchItems.post' => 'onWriteItemsPost',
-			'touchItem.exception' => 'onException',
-			'touchItems.exception' => 'onException',
-				
-			'removeItem.post' => 'onRemoveItemPost',
-			'removeItems.post' => 'onRemoveItemsPost',
-			'removeItem.exception' => 'onException',
-			'removeItems.exception' => 'onException',
-		);
 		foreach ($expectedListeners as $eventName => $expectedCallbackMethod) {
 			$listeners = $this->_adapter->getEventManager()->getListeners($eventName);
 	
@@ -80,7 +51,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 			// check expected callback method
 			$cb = $listeners->top()->getCallback();
 			$this->assertArrayHasKey(0, $cb);
-			$this->assertSame($this->_plugin, $cb[0]);
+			$this->assertSame($plugin, $cb[0]);
 			$this->assertArrayHasKey(1, $cb);
 			$this->assertSame($expectedCallbackMethod, $cb[1]);
 	
@@ -93,6 +64,90 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 				$this->assertSame(-100, $meta['priority']);
 			}
 		}
+	}
+	
+	public function addPluginProvider()
+	{
+		return array(
+			array(
+				EventLogger::LISTENERS_ALL,
+				array(
+					'getItem.post' => 'onReadItemPost',
+					'getItems.post' => 'onReadItemsPost',
+					'getItem.exception' => 'onException',
+					'getItems.exception' => 'onException',
+						
+					'setItem.post' => 'onWriteItemPost',
+					'setItems.post' => 'onWriteItemsPost',
+					'setItem.exception' => 'onException',
+					'setItems.exception' => 'onException',
+						
+					'addItem.post' => 'onWriteItemPost',
+					'addItems.post' => 'onWriteItemsPost',
+					'addItem.exception' => 'onException',
+					'addItems.exception' => 'onException',
+							
+					'replaceItem.post' => 'onWriteItemPost',
+					'replaceItems.post' => 'onWriteItemsPost',
+					'replaceItem.exception' => 'onException',
+					'replaceItems.exception' => 'onException',
+							
+					'checkAndSetItem.post' => 'onWriteItemPost',
+					'checkAndSetItem.exception' => 'onException',
+							
+					'touchItem.post' => 'onWriteItemPost',
+					'touchItems.post' => 'onWriteItemsPost',
+					'touchItem.exception' => 'onException',
+					'touchItems.exception' => 'onException',
+						
+					'removeItem.post' => 'onRemoveItemPost',
+					'removeItems.post' => 'onRemoveItemsPost',
+					'removeItem.exception' => 'onException',
+					'removeItems.exception' => 'onException',
+				),
+			),
+			array(
+				EventLogger::LISTENERS_EXCEPTION,
+				array(
+					'getItem.exception' => 'onException',
+					'getItems.exception' => 'onException',
+					'setItem.exception' => 'onException',
+					'setItems.exception' => 'onException',
+					'addItem.exception' => 'onException',
+					'addItems.exception' => 'onException',
+					'replaceItem.exception' => 'onException',
+					'replaceItems.exception' => 'onException',
+					'checkAndSetItem.exception' => 'onException',
+					'touchItem.exception' => 'onException',
+					'touchItems.exception' => 'onException',
+					'removeItem.exception' => 'onException',
+					'removeItems.exception' => 'onException',
+				),
+			),
+			array(
+				EventLogger::LISTENERS_WRITE | EventLogger::LISTENERS_REMOVE, //test that we can bit-OR multiple listeners
+				array(
+					'setItem.post' => 'onWriteItemPost',
+					'setItems.post' => 'onWriteItemsPost',
+					'addItem.post' => 'onWriteItemPost',
+					'addItems.post' => 'onWriteItemsPost',
+					'replaceItem.post' => 'onWriteItemPost',
+					'replaceItems.post' => 'onWriteItemsPost',
+					'checkAndSetItem.post' => 'onWriteItemPost',
+					'touchItem.post' => 'onWriteItemPost',
+					'touchItems.post' => 'onWriteItemsPost',
+					'removeItem.post' => 'onRemoveItemPost',
+					'removeItems.post' => 'onRemoveItemsPost',
+				),
+			),
+			array(
+				EventLogger::LISTENERS_READ,
+				array(
+					'getItem.post' => 'onReadItemPost',
+					'getItems.post' => 'onReadItemsPost',
+				),
+			),
+		);
 	}
 	
 	public function testRemovePlugin()
