@@ -9,6 +9,7 @@ namespace Deakin\Zend\Cache\Storage\Plugin;
 
 use stdClass;
 use Zend\Cache\Storage\PostEvent;
+use Zend\Cache\Storage\ExceptionEvent;
 use Zend\Cache\Storage\Plugin\AbstractPlugin;
 use Zend\EventManager\EventManagerInterface;
 
@@ -32,25 +33,38 @@ class EventLogger extends AbstractPlugin
         // read
         $this->listeners[] = $events->attach('getItem.post', array($this, 'onReadItemPost'), $postPriority);
         $this->listeners[] = $events->attach('getItems.post', array($this, 'onReadItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('getItem.exception', array($this, 'onException'), $postPriority);
+        $this->listeners[] = $events->attach('getItems.exception', array($this, 'onException'), $postPriority);
 
         // write
         $this->listeners[] = $events->attach('setItem.post', array($this, 'onWriteItemPost'), $postPriority);
         $this->listeners[] = $events->attach('setItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('setItem.exception', array($this, 'onException'), $postPriority);
+        $this->listeners[] = $events->attach('setItems.exception', array($this, 'onException'), $postPriority);
 
         $this->listeners[] = $events->attach('addItem.post', array($this, 'onWriteItemPost'), $postPriority);
         $this->listeners[] = $events->attach('addItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('addItem.exception', array($this, 'onException'), $postPriority);
+        $this->listeners[] = $events->attach('addItems.exception', array($this, 'onException'), $postPriority);
         
         $this->listeners[] = $events->attach('touchItem.post', array($this, 'onWriteItemPost'), $postPriority);
         $this->listeners[] = $events->attach('touchItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('touchItem.exception', array($this, 'onException'), $postPriority);
+        $this->listeners[] = $events->attach('touchItems.exception', array($this, 'onException'), $postPriority);
 
         $this->listeners[] = $events->attach('replaceItem.post', array($this, 'onWriteItemPost'), $postPriority);
         $this->listeners[] = $events->attach('replaceItems.post', array($this, 'onWriteItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('replaceItem.exception', array($this, 'onException'), $postPriority);
+        $this->listeners[] = $events->attach('replaceItems.exception', array($this, 'onException'), $postPriority);
 
         $this->listeners[] = $events->attach('checkAndSetItem.post', array($this, 'onWriteItemPost'), $postPriority);
+        $this->listeners[] = $events->attach('checkAndSetItem.exception', array($this, 'onException'), $postPriority);
         
         // remove
         $this->listeners[] = $events->attach('removeItem.post', array($this, 'onRemoveItemPost'), $postPriority);
         $this->listeners[] = $events->attach('removeItems.post', array($this, 'onRemoveItemsPost'), $postPriority);
+        $this->listeners[] = $events->attach('removeItem.exception', array($this, 'onException'), $postPriority);
+        $this->listeners[] = $events->attach('removeItems.exception', array($this, 'onException'), $postPriority);
     }
 
 	public function onReadItemPost(PostEvent $event)
@@ -169,5 +183,21 @@ class EventLogger extends AbstractPlugin
 				)
 			);
 		}
+	}
+	
+	public function onException(ExceptionEvent $event)
+	{
+		$storage = $event->getStorage();
+		$success = $event->getResult();
+		$this->getOptions()->getLogger()->error(
+			'exception',
+			array(
+				'key' => $event->getParam('key'),
+				'event' => $event->getName(),
+				'adapter' => get_class($storage),
+				'namespace' => $storage->getOptions()->getNamespace(),
+				'exception' => $event->getException(),
+			)
+		);
 	}
 }

@@ -6,6 +6,7 @@ use Deakin\Zend\Cache\Storage\Plugin\EventLogger;
 use Deakin\Zend\Cache\Storage\Plugin\EventLoggerOptions;
 
 use Zend\Cache\Storage\PostEvent;
+use Zend\Cache\Storage\ExceptionEvent;
 use ArrayObject;
 use Zend\Cache\Storage\Adapter\AdapterOptions;
 use Monolog\Logger;
@@ -27,8 +28,8 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$this->_adapter->setOptions($adapterOptions);
 		
 		$this->_plugin = new EventLogger();
-		$this->_logger = new Logger('test-cache-events');
-		$this->_logger->pushHandler(new NullHandler());
+		/*$this->_logger = new Logger('test-cache-events');
+		$this->_logger->pushHandler(new NullHandler());*/
 	}
 	
 	public function testAddPlugin()
@@ -39,19 +40,36 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$expectedListeners = array(
 			'getItem.post' => 'onReadItemPost',
 			'getItems.post' => 'onReadItemsPost',
+			'getItem.exception' => 'onException',
+			'getItems.exception' => 'onException',
 	
 			'setItem.post' => 'onWriteItemPost',
 			'setItems.post' => 'onWriteItemsPost',
+			'setItem.exception' => 'onException',
+			'setItems.exception' => 'onException',
+				
 			'addItem.post' => 'onWriteItemPost',
 			'addItems.post' => 'onWriteItemsPost',
+			'addItem.exception' => 'onException',
+			'addItems.exception' => 'onException',
+			
 			'replaceItem.post' => 'onWriteItemPost',
 			'replaceItems.post' => 'onWriteItemsPost',
+			'replaceItem.exception' => 'onException',
+			'replaceItems.exception' => 'onException',
+			
 			'checkAndSetItem.post' => 'onWriteItemPost',
+			'checkAndSetItem.exception' => 'onException',
+			
 			'touchItem.post' => 'onWriteItemPost',
 			'touchItems.post' => 'onWriteItemsPost',
+			'touchItem.exception' => 'onException',
+			'touchItems.exception' => 'onException',
 				
 			'removeItem.post' => 'onRemoveItemPost',
 			'removeItems.post' => 'onRemoveItemsPost',
+			'removeItem.exception' => 'onException',
+			'removeItems.exception' => 'onException',
 		);
 		foreach ($expectedListeners as $eventName => $expectedCallbackMethod) {
 			$listeners = $this->_adapter->getEventManager()->getListeners($eventName);
@@ -122,7 +140,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$pluginOptions->setLogger($mock);
 		$plugin = new EventLogger();
 		$plugin->setOptions($pluginOptions);
-		//$this->_adapter->addPlugin($plugin);
+		$this->_adapter->addPlugin($plugin);
 		
 		$event = new PostEvent('getItem.post', $this->_adapter, new ArrayObject(array(
 			'key' => $key,
@@ -162,7 +180,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$pluginOptions->setLogger($mock);
 		$plugin = new EventLogger();
 		$plugin->setOptions($pluginOptions);
-		//$this->_adapter->addPlugin($plugin);
+		$this->_adapter->addPlugin($plugin);
 	
 		$event = new PostEvent('getItem.post', $this->_adapter, new ArrayObject(array(
 				'keys' => $keys
@@ -207,7 +225,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$pluginOptions->setLogger($mock);
 		$plugin = new EventLogger();
 		$plugin->setOptions($pluginOptions);
-		//$this->_adapter->addPlugin($plugin);
+		$this->_adapter->addPlugin($plugin);
 	
 		$event = new PostEvent('removeItem.post', $this->_adapter, new ArrayObject(array(
 				'key' => $key
@@ -246,7 +264,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$pluginOptions->setLogger($mock);
 		$plugin = new EventLogger();
 		$plugin->setOptions($pluginOptions);
-		//$this->_adapter->addPlugin($plugin);
+		$this->_adapter->addPlugin($plugin);
 	
 		$event = new PostEvent('removeItems.post', $this->_adapter, new ArrayObject(array('keys' => $keys)), $keysNotRemoved);
 		$plugin->onRemoveItemsPost($event);
@@ -289,7 +307,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$pluginOptions->setLogger($mock);
 		$plugin = new EventLogger();
 		$plugin->setOptions($pluginOptions);
-		//$this->_adapter->addPlugin($plugin);
+		$this->_adapter->addPlugin($plugin);
 	
 		$event = new PostEvent('writeItem.post', $this->_adapter, new ArrayObject(array(
 				'key' => $key,
@@ -329,7 +347,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$pluginOptions->setLogger($mock);
 		$plugin = new EventLogger();
 		$plugin->setOptions($pluginOptions);
-		//$this->_adapter->addPlugin($plugin);
+		$this->_adapter->addPlugin($plugin);
 	
 		$event = new PostEvent('writeItems.post', $this->_adapter, new ArrayObject($keyValuePairs), $keysNotWritten);
 		$plugin->onWriteItemsPost($event);
@@ -352,6 +370,26 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 				array('key1' => 'data1', 'key2' => 'data2', 'key3' => 'data3'), array('key1', 'key2', 'key3'), array('fail', 'fail', 'fail')
 			)
 		);
+	}
+	
+	public function testException()
+	{
+		$mock = $this->getMockBuilder('Psr\Log\NullLogger')->getMock();
+		$mock->expects($this->once())
+			->method('error')
+			->with($this->stringContains('exception'));
+		
+		$pluginOptions = new EventLoggerOptions();
+		$pluginOptions->setLogger($mock);
+		$plugin = new EventLogger();
+		$plugin->setOptions($pluginOptions);
+		$this->_adapter->addPlugin($plugin);
+		
+		$testException = new \Exception('a test exception');
+		$result = false;
+		
+		$event = new ExceptionEvent('getItem.exception', $this->_adapter, new ArrayObject(), $result, $testException);
+		$plugin->onException($event);
 	}
 }
 
