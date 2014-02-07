@@ -9,6 +9,7 @@ namespace Deakin\Zend\Cache\Storage\Plugin;
 
 use Traversable;
 use Zend\Cache\Storage\Plugin\PluginOptions;
+use Deakin\Zend\Cache\Storage\Plugin\EventLogger;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -22,6 +23,8 @@ class EventLoggerOptions extends PluginOptions
 	 */
 	protected $logger;
 	
+	protected $activeListeners;
+	
     /**
      * Constructor
      *
@@ -31,7 +34,8 @@ class EventLoggerOptions extends PluginOptions
      */
     public function __construct($options = null)
     {
-        parent::__construct($options);
+        $this->activeListeners = EventLogger::LISTENERS_ALL;
+    	parent::__construct($options);
     }
 
     public function setLogger(LoggerInterface &$logger)
@@ -43,5 +47,15 @@ class EventLoggerOptions extends PluginOptions
     public function getLogger()
     {
     	return $this->logger;
+    }
+    
+    public function setActiveListeners($activeListeners)
+    {
+    	$this->activeListeners = $activeListeners;
+    }
+    
+    public function getActiveListeners()
+    {
+    	return $this->activeListeners;
     }
 }

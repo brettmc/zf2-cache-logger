@@ -19,10 +19,13 @@ class EventLoggerOptionsTest extends \PHPUnit_Framework_TestCase
 	public function testOptions()
 	{
 		$logger = new NullLogger();
+		$activeListeners = 1;
 		$new = new EventLoggerOptions(array(
-			'logger' => $logger
+			'logger' => $logger,
+			'activeListeners' => $activeListeners,
 		));
 		$this->assertSame($logger, $new->getLogger());
+		$this->assertSame($activeListeners, $new->getActiveListeners());
 	}
 
 }

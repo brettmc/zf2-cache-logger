@@ -9,14 +9,13 @@ use Zend\Cache\Storage\PostEvent;
 use Zend\Cache\Storage\ExceptionEvent;
 use ArrayObject;
 use Zend\Cache\Storage\Adapter\AdapterOptions;
-use Monolog\Logger;
+use Psr\Log\NullLogger;
 
 class EventLoggerTest extends \PHPUnit_Framework_TestCase
 {
 	protected $_adapter;
 	protected $_options;
 	protected $_plugin;
-	protected $_pluginOptions;
 	protected $_logger;
 	
 	public function setUp()
@@ -27,8 +26,15 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 		$adapterOptions->setTtl(10);
 		$this->_adapter->setOptions($adapterOptions);
 		
-		$this->_pluginOptions = new EventLoggerOptions();
 		$this->_plugin = new EventLogger();
+	}
+	
+	public function testPluginDefaultOptions()
+	{
+		$plugin = new EventLogger();
+		$this->assertInstanceOf('Deakin\Zend\Cache\Storage\Plugin\EventLoggerOptions', $plugin->getOptions());
+		$this->assertEquals(EventLogger::LISTENERS_ALL, $plugin->getOptions()->getActiveListeners());
+		$this->assertNull($plugin->getOptions()->getLogger());
 	}
 	
 	/**
@@ -38,9 +44,16 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testAddPlugin($activeListeners, $expectedListeners)
 	{
-		$plugin = new EventLogger();
-		$plugin->setActiveListeners($activeListeners);
-		$this->_adapter->addPlugin($plugin, 100);
+		$this->_plugin->setOptions(
+			new EventLoggerOptions(
+				array(
+					'logger' => new NullLogger(),
+					'activeListeners' => $activeListeners
+				)
+			)
+		);
+		
+		$this->_adapter->addPlugin($this->_plugin, 100);
 	
 		foreach ($expectedListeners as $eventName => $expectedCallbackMethod) {
 			$listeners = $this->_adapter->getEventManager()->getListeners($eventName);
@@ -51,7 +64,7 @@ class EventLoggerTest extends \PHPUnit_Framework_TestCase
 			// check expected callback method
 			$cb = $listeners->top()->getCallback();
 			$this->assertArrayHasKey(0, $cb);
-			$this->assertSame($plugin, $cb[0]);
+			$this->assertSame($this->_plugin, $cb[0]);
 			$this->assertArrayHasKey(1, $cb);
 			$this->assertSame($expectedCallbackMethod, $cb[1]);
 	

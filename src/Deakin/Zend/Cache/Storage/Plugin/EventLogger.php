@@ -26,14 +26,12 @@ class EventLogger extends AbstractPlugin
 	const LISTENERS_REMOVE = 4;
 	const LISTENERS_EXCEPTION = 8;
 	
-	protected $activeListeners = self::LISTENERS_ALL;
-	
 	/**
 	* {@inheritDoc}
 	*/
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        $activeListeners = $this->activeListeners;
+        $activeListeners = $this->getOptions()->getActiveListeners();
         // The higher the priority the sooner the plugin will be called on pre events
         // but the later it will be called on post events.
         $prePriority = $priority;
@@ -226,5 +224,13 @@ class EventLogger extends AbstractPlugin
 				'exception' => $event->getException(),
 			)
 		);
+	}
+	
+	public function getOptions()
+	{
+		if (null === $this->options) {
+			$this->setOptions(new EventLoggerOptions());
+		}
+		return parent::getOptions();
 	}
 }
