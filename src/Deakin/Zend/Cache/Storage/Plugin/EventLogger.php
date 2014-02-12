@@ -213,7 +213,6 @@ class EventLogger extends AbstractPlugin
 	public function onException(ExceptionEvent $event)
 	{
 		$storage = $event->getStorage();
-		$success = $event->getResult();
 		$this->getOptions()->getLogger()->error(
 			'exception',
 			array(
