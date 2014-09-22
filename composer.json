@@ -17,8 +17,8 @@
 	],
 	"require" : {
 		"php" : ">=5.3.2",
-		"zendframework/zend-cache" : "2.2.*",
-		"zendframework/zend-eventmanager": "2.2.*",
+		"zendframework/zend-cache" : "~2.2",
+		"zendframework/zend-eventmanager": "~2.2",
 		"monolog/monolog": "~1.5",
 		"psr/log": "~1.0"
 	},
